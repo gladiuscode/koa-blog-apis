@@ -68,7 +68,9 @@ router.post('/refresh', async (ctx) => {
 });
 
 router.get('/tryAuth', authenticationMiddleware, async (ctx) => {
-  ctx.response.message = "Congratulations! You pass our authentication";
+  ctx.response.body = {
+    message: "Congratulations! You pass our authentication",
+  }
 });
 
 app.listen(3000, () => {
