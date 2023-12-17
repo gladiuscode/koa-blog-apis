@@ -11,8 +11,14 @@ const authenticationMiddleware: Koa.Middleware = async (context, next) => {
   }
 
   const actualToken = accessToken.slice(accessToken.indexOf(' ') + 1);
-  AuthenticationUtils.verifyToken(actualToken);
-  await next();
+
+  try {
+    AuthenticationUtils.verifyToken(actualToken);
+    await next();
+  } catch (e) {
+    context.status = 401;
+    context.message = "Access Denied. Token Expired";
+  }
 }
 
 export default authenticationMiddleware;
