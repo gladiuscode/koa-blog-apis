@@ -1,5 +1,5 @@
 import Koa from "koa";
-import AuthenticationUtils from "../utils/authentication.utils";
+import AuthenticationUtils from "../utils/authentication.utils.js";
 
 const authenticationMiddleware: Koa.Middleware = async (context, next) => {
   const accessToken = context.headers['authorization'];

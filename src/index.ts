@@ -1,8 +1,8 @@
 import Koa from 'koa';
 import Router from '@koa/router';
 import {bodyParser} from "@koa/bodyparser";
-import loggerMiddleware from "./middlewares/logger.middleware";
-import authRouter from "./routes/auth/auth.routes";
+import loggerMiddleware from "./middlewares/logger.middleware.js";
+import authRouter from "./routes/auth/auth.routes.js";
 
 const app = new Koa();
 const router = new Router();

@@ -1,6 +1,6 @@
 import Router from "@koa/router";
-import AuthenticationUtils from "../../utils/authentication.utils";
-import authenticationMiddleware from "../../middlewares/authentication.middleware";
+import AuthenticationUtils from "../../utils/authentication.utils.js";
+import authenticationMiddleware from "../../middlewares/authentication.middleware.js";
 
 const authRouter = new Router({
   prefix: '/auth'
