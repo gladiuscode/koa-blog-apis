@@ -1,6 +1,7 @@
 import Router from "@koa/router";
 import AuthenticationUtils from "../../utils/authentication.utils.js";
 import authenticationMiddleware from "../../middlewares/authentication.middleware.js";
+import database from "../../database/init.database.js";
 
 const authRouter = new Router({
   prefix: '/auth'
@@ -21,6 +22,32 @@ authRouter.post('/login', async (ctx) => {
     ctx.response.status = 500;
     ctx.response.message = "Something went terribly wrong";
   }
+});
+
+authRouter.post('/signup', async (ctx) => {
+  const {email, password} = ctx.request.body;
+  if (!email || !password) {
+    ctx.response.status = 400;
+    ctx.response.message = "Missing email and / or password";
+    return;
+  }
+
+  const isAlreadyRegistered = !!database.data.users.find(user => user.email === email);
+  if (isAlreadyRegistered) {
+    ctx.response.status = 400;
+    ctx.response.message = "This email is already used";
+    return;
+  }
+
+  database.data.users.push({
+    id: '1',
+    email,
+    password,
+  });
+  await database.write();
+
+  ctx.response.status = 200;
+  ctx.response.message = "User created. Please login";
 });
 
 authRouter.post('/refresh', async (ctx) => {
