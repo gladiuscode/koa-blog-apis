@@ -13,8 +13,14 @@ const authenticationMiddleware: Koa.Middleware = async (context, next) => {
   const actualToken = accessToken.slice(accessToken.indexOf(' ') + 1);
 
   try {
-    AuthenticationUtils.verifyToken(actualToken);
-    await next();
+    const decodedJWT = AuthenticationUtils.verifyToken(actualToken);
+    if (typeof decodedJWT.payload === 'string') {
+      context.state.userEmail = decodedJWT.payload;
+      return next();
+    }
+
+    context.state.userEmail = decodedJWT.payload.email;
+    return next();
   } catch (e) {
     context.status = 401;
     context.message = "Access Denied. Token Expired";
