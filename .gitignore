@@ -131,3 +131,6 @@ dist
 
 # westorm
 .idea/
+
+# lowdb
+db.json
