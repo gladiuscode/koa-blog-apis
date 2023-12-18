@@ -15,8 +15,14 @@ authRouter.post('/login', async (ctx) => {
     return;
   }
 
+  const isUnknown = !database.data.users.find(user => user.email === email);
+  if (isUnknown) {
+    ctx.response.status = 400;
+    ctx.response.message = "User doesn't exist. Please register";
+    return;
+  }
+
   try {
-    // todo: implement authentication against db
     ctx.response.body = AuthenticationUtils.generateTokens({ email });
   } catch (e) {
     ctx.response.status = 500;
