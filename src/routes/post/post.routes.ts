@@ -45,7 +45,7 @@ postRouter.post('/', authenticationMiddleware, async (ctx) => {
     id: v4(),
     title,
     description,
-    author: currentUser.email,
+    author: currentUser.id,
     date: date ?? new Date().toISOString(),
   })
 
@@ -55,5 +55,35 @@ postRouter.post('/', authenticationMiddleware, async (ctx) => {
   ctx.response.message = "Post creation completed";
 });
 
+postRouter.delete('/:id', authenticationMiddleware, async (ctx) => {
+  const currentUser = database.data.users.find(user => user.email === ctx.state.userEmail);
+  if (!currentUser) {
+    ctx.response.status = 404;
+    ctx.response.message = "User not found";
+    return;
+  }
+
+  const { id } = ctx.params;
+  const selectedPost = database.data.posts.find(post => post.id === id);
+  if (!selectedPost) {
+    ctx.response.status = 404;
+    ctx.response.message = "Post not found";
+    return;
+  }
+
+  const isAuthor = currentUser.id === selectedPost.author;
+  if (!isAuthor) {
+    ctx.response.status = 401;
+    ctx.response.message = "You can't delete other people's posts";
+    return;
+  }
+
+  database.data.posts = database.data.posts.filter(post => post.id !== selectedPost.id);
+
+  await database.write();
+
+  ctx.response.status = 200;
+  ctx.response.message = "Your post has been deleted";
+});
 
 export default postRouter;
