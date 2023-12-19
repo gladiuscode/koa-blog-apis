@@ -4,6 +4,7 @@ import {bodyParser} from "@koa/bodyparser";
 import loggerMiddleware from "./middlewares/logger.middleware.js";
 import authRouter from "./routes/auth/auth.routes.js";
 import userRouter from "./routes/user/user.routes.js";
+import postRouter from "./routes/post/post.routes.js";
 
 const app = new Koa();
 const router = new Router();
@@ -11,6 +12,7 @@ const router = new Router();
 router.use(
   authRouter.routes(),
   userRouter.routes(),
+  postRouter.routes(),
 );
 
 //////////////////////////////////////////

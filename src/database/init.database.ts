@@ -1,10 +1,11 @@
 import {JSONPreset} from "lowdb/node";
-import {User} from "./types.database.js";
+import {Post, User} from "./types.database.js";
 
 interface Database {
   users: User[];
+  posts: Post[];
 }
 
-const database = await JSONPreset<Database>('db.json', { users: [] });
+const database = await JSONPreset<Database>('db.json', { users: [], posts: [] });
 
 export default database;
