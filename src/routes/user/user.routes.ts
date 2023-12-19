@@ -18,4 +18,18 @@ usersRouter.get('/me', authenticationMiddleware, async (ctx) => {
   ctx.response.body = currentUser;
 });
 
+usersRouter.delete('/', authenticationMiddleware, async (ctx) => {
+  const currentUser = database.data.users.find(user => user.email === ctx.state.userEmail);
+  if (!currentUser) {
+    ctx.response.status = 404;
+    ctx.response.message = "User not found";
+    return;
+  }
+
+  database.data.users = database.data.users.filter(user => user.email !== ctx.state.userEmail);
+
+  ctx.response.status = 200;
+  ctx.response.message = "User has been deleted";
+});
+
 export default usersRouter;
