@@ -3,7 +3,7 @@ import authenticationMiddleware from "../../middlewares/authentication.middlewar
 import database from "../../database/init.database.js";
 
 const usersRouter = new Router({
-  prefix: '/users'
+  prefix: '/user'
 });
 
 usersRouter.get('/me', authenticationMiddleware, async (ctx) => {
