@@ -2,11 +2,11 @@ import Router from "@koa/router";
 import authenticationMiddleware from "../../middlewares/authentication.middleware.js";
 import database from "../../database/init.database.js";
 
-const usersRouter = new Router({
+const userRouter = new Router({
   prefix: '/user'
 });
 
-usersRouter.get('/me', authenticationMiddleware, async (ctx) => {
+userRouter.get('/me', authenticationMiddleware, async (ctx) => {
   const currentUser = database.data.users.find(user => user.email === ctx.state.userEmail);
   if (!currentUser) {
     ctx.response.status = 404;
@@ -18,7 +18,7 @@ usersRouter.get('/me', authenticationMiddleware, async (ctx) => {
   ctx.response.body = currentUser;
 });
 
-usersRouter.delete('/', authenticationMiddleware, async (ctx) => {
+userRouter.delete('/', authenticationMiddleware, async (ctx) => {
   const currentUser = database.data.users.find(user => user.email === ctx.state.userEmail);
   if (!currentUser) {
     ctx.response.status = 404;
@@ -32,4 +32,4 @@ usersRouter.delete('/', authenticationMiddleware, async (ctx) => {
   ctx.response.message = "User has been deleted";
 });
 
-export default usersRouter;
+export default userRouter;
