@@ -12,7 +12,7 @@ postRouter.get('/', async (ctx) => {
   ctx.response.body = database.data.posts;
 });
 
-postRouter.get('/:id', authenticationMiddleware, async (ctx) => {
+postRouter.get('/:id', async (ctx) => {
   const { id } = ctx.params;
 
   const selectedPost = database.data.posts.find(post => post.id === id);
