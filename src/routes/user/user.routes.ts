@@ -28,6 +28,8 @@ userRouter.delete('/', authenticationMiddleware, async (ctx) => {
 
   database.data.users = database.data.users.filter(user => user.email !== ctx.state.userEmail);
 
+  await database.write();
+
   ctx.response.status = 200;
   ctx.response.message = "User has been deleted";
 });
