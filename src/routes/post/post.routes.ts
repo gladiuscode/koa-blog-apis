@@ -6,6 +6,11 @@ const postRouter = new Router({
   prefix: '/post'
 });
 
+postRouter.get('/', async (ctx) => {
+  ctx.response.status = 200;
+  ctx.response.body = database.data.posts;
+});
+
 postRouter.get('/:id', authenticationMiddleware, async (ctx) => {
   const { id } = ctx.params;
 
