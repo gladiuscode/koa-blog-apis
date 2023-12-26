@@ -1,5 +1,14 @@
 import Koa from "koa";
 import AuthenticationUtils from "../utils/authentication.utils.js";
+import {Jwt} from "jsonwebtoken";
+
+const getUserEmailInJwt = (payload: Jwt['payload']) => {
+  if (typeof payload === 'string') {
+    return payload;
+  }
+
+  return payload.email;
+}
 
 const authenticationMiddleware: Koa.Middleware = async (context, next) => {
   const accessToken = context.headers['authorization'];
@@ -14,12 +23,15 @@ const authenticationMiddleware: Koa.Middleware = async (context, next) => {
 
   try {
     const decodedJWT = AuthenticationUtils.verifyToken(actualToken);
-    if (typeof decodedJWT.payload === 'string') {
-      context.state.userEmail = decodedJWT.payload;
-      return next();
+    const email = getUserEmailInJwt(decodedJWT.payload);
+    const user = await context.state.database.getUserBy(email);
+    if (!user) {
+      context.status = 404;
+      context.message = "User not found.";
+      return;
     }
 
-    context.state.userEmail = decodedJWT.payload.email;
+    context.state.user = user;
     return next();
   } catch (e) {
     context.status = 401;

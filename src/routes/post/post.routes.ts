@@ -25,13 +25,6 @@ postRouter.get('/:id', async (ctx) => {
 });
 
 postRouter.post('/', authenticationMiddleware, async (ctx) => {
-  const currentUser = await ctx.state.database.getUserBy(ctx.state.userEmail);
-  if (!currentUser) {
-    ctx.response.status = 404;
-    ctx.response.message = "User not found";
-    return;
-  }
-
   const { title, description, date } = ctx.request.body;
   if (!title || !description) {
     ctx.response.status = 404;
@@ -39,7 +32,7 @@ postRouter.post('/', authenticationMiddleware, async (ctx) => {
     return;
   }
 
-  const newPost = await ctx.state.database.createPost({title, description, date, author: currentUser.id});
+  const newPost = await ctx.state.database.createPost({title, description, date, author: ctx.state.user.id});
 
   ctx.response.status = 200;
   ctx.response.message = "Post creation completed";
@@ -47,13 +40,6 @@ postRouter.post('/', authenticationMiddleware, async (ctx) => {
 });
 
 postRouter.delete('/:id', authenticationMiddleware, async (ctx) => {
-  const currentUser = await ctx.state.database.getUserBy(ctx.state.userEmail);
-  if (!currentUser) {
-    ctx.response.status = 404;
-    ctx.response.message = "User not found";
-    return;
-  }
-
   const { id } = ctx.params;
   const selectedPost = await ctx.state.database.getPostBy(id);
   if (!selectedPost) {
@@ -62,7 +48,7 @@ postRouter.delete('/:id', authenticationMiddleware, async (ctx) => {
     return;
   }
 
-  const isAuthor = currentUser.id === selectedPost.author;
+  const isAuthor = ctx.state.user.id === selectedPost.author;
   if (!isAuthor) {
     ctx.response.status = 401;
     ctx.response.message = "You can't delete other people's posts";
