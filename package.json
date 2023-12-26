@@ -1,7 +1,7 @@
 {
   "name": "blog-api-server",
   "version": "0.0.1",
-  "description": "",
+  "description": "This is a simple blog api server",
   "type": "module",
   "exports": "./dist/index.js",
   "scripts": {
@@ -9,8 +9,8 @@
     "build": "tsc",
     "serve": "npm run build && npm run start"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "gladiuscode",
+  "license": "MIT",
   "dependencies": {
     "@koa/bodyparser": "^5.0.0",
     "@koa/router": "^12.0.1",
