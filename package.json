@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node ./dist",
     "build": "tsc",
-    "serve": "npm run build && npm run build"
+    "serve": "npm run build && npm run start"
   },
   "author": "",
   "license": "ISC",
