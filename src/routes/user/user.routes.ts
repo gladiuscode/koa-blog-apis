@@ -25,10 +25,11 @@ userRouter.delete('/', authenticationMiddleware, async (ctx) => {
     return;
   }
 
-  await ctx.state.database.deleteUserBy(currentUser.email);
+  const deletedUser = await ctx.state.database.deleteUserBy(currentUser.email);
 
   ctx.response.status = 200;
   ctx.response.message = "User has been deleted";
+  ctx.response.body = deletedUser;
 });
 
 export default userRouter;

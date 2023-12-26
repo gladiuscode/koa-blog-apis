@@ -39,10 +39,11 @@ postRouter.post('/', authenticationMiddleware, async (ctx) => {
     return;
   }
 
-  await ctx.state.database.createPost({title, description, date, author: currentUser.id});
+  const newPost = await ctx.state.database.createPost({title, description, date, author: currentUser.id});
 
   ctx.response.status = 200;
   ctx.response.message = "Post creation completed";
+  ctx.response.body = newPost;
 });
 
 postRouter.delete('/:id', authenticationMiddleware, async (ctx) => {
@@ -68,10 +69,11 @@ postRouter.delete('/:id', authenticationMiddleware, async (ctx) => {
     return;
   }
 
-  await ctx.state.database.deletePostBy(id);
+  const deletedPost = await ctx.state.database.deletePostBy(id);
 
   ctx.response.status = 200;
   ctx.response.message = "Your post has been deleted";
+  ctx.response.body = deletedPost;
 });
 
 export default postRouter;
