@@ -2,6 +2,11 @@ import database from "../../database/init.database.js";
 import {v4} from "uuid";
 import {Post, User} from "../../database/types.database.js";
 
+interface CreateUserPayload {
+  email: string;
+  password: string;
+}
+
 interface CreatePostPayload {
   title: string;
   description: string;
@@ -11,6 +16,7 @@ interface CreatePostPayload {
 
 export interface IDatabaseDatasource {
   getUserBy(email: string): Promise<User | undefined>;
+  createUser(payload: CreateUserPayload): Promise<User | undefined>;
   deleteUserBy(email: string): Promise<User | undefined>;
   getPosts(): Promise<Post[]>;
   getPostBy(id: string): Promise<Post | undefined>;
@@ -25,6 +31,19 @@ class DatabaseDatasource implements IDatabaseDatasource {
 
   getUserBy(email: string) {
     return Promise.resolve(database.data.users.find(user => user.email === email));
+  }
+
+  async createUser({ email, password }: CreateUserPayload) {
+    const newUser: User = {
+      id: v4(),
+      email,
+      password,
+    }
+
+    database.data.users.push(newUser);
+    await database.write();
+
+    return newUser;
   }
 
   async deleteUserBy(email: string) {
