@@ -29,4 +29,19 @@ userRouter.delete('/post', async (ctx) => {
   ctx.response.body = deletedPosts;
 })
 
+userRouter.get('/comment', authenticationMiddleware, async (ctx) => {
+  const comments = await ctx.state.database.getUserComments(ctx.state.user.id);
+
+  ctx.response.status = 200;
+  ctx.response.body = comments;
+})
+
+userRouter.delete('/comment', authenticationMiddleware, async (ctx) => {
+  const deletedComments = await ctx.state.database.deleteUserComments(ctx.state.user.id);
+
+  ctx.response.status = 200;
+  ctx.response.message = "Your comments have been deleted";
+  ctx.response.body = deletedComments;
+});
+
 export default userRouter;

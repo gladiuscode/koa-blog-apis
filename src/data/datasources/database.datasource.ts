@@ -1,6 +1,6 @@
 import database from "../../database/init.database.js";
 import {v4} from "uuid";
-import {Post, User} from "../../database/types.database.js";
+import {Post, User, Comment} from "../../database/types.database.js";
 
 interface CreateUserPayload {
   email: string;
@@ -10,6 +10,13 @@ interface CreateUserPayload {
 interface CreatePostPayload {
   title: string;
   description: string;
+  author: string;
+  date?: string;
+}
+
+interface CreateCommentPayload {
+  text: string;
+  postId: string;
   author: string;
   date?: string;
 }
@@ -31,6 +38,12 @@ export interface IDatabaseDatasource {
   createPost(payload: CreatePostPayload): Promise<Post>;
   deletePostBy(id: string): Promise<Post | undefined>;
   updatePostBy(payload: UpdatePostPayload): Promise<Post | undefined>;
+  getComments(): Promise<Comment[]>;
+  getCommentBy(id: string): Promise<Comment | undefined>;
+  getUserComments(author: string): Promise<Comment[]>;
+  createComment(payload: CreateCommentPayload): Promise<Comment>;
+  deleteCommentBy(id: string): Promise<Comment | undefined>;
+  deleteUserComments(author: string): Promise<Comment[]>;
 }
 
 class DatabaseDatasource implements IDatabaseDatasource {
@@ -147,6 +160,60 @@ class DatabaseDatasource implements IDatabaseDatasource {
     await database.write();
 
     return updatedPost;
+  }
+
+  getComments() {
+    return Promise.resolve(database.data.comments);
+  }
+
+  getCommentBy(id: string): Promise<Comment | undefined> {
+    return Promise.resolve(database.data.comments.find(comment => comment.id === id));
+  }
+
+  async createComment({ text, postId, author, date }: CreateCommentPayload) {
+    const newComment: Comment = {
+      id: v4(),
+      postId,
+      text,
+      author,
+      date: date ?? new Date().toISOString(),
+    };
+
+    database.data.comments.push(newComment);
+
+    await database.write();
+
+    return newComment;
+  }
+
+  async deleteCommentBy(id: string) {
+    const commentIndex = database.data.comments.findIndex(comment => comment.id === id);
+    if (commentIndex == -1) {
+      return;
+    }
+
+    const comment = database.data.comments[commentIndex];
+
+    database.data.comments = database.data.comments.filter(comment => comment.id !== id);
+    await database.write();
+
+    return comment;
+  }
+
+  async deleteUserComments(author: string): Promise<Comment[]> {
+    const userComments = database.data.comments.filter(comment => comment.author === author);
+    if (!userComments.length) {
+      return [];
+    }
+
+    database.data.comments = database.data.comments.filter(comment => !userComments.find(userComment => userComment.id === comment.author));
+    await database.write();
+
+    return userComments;
+  }
+
+  getUserComments(author: string): Promise<Comment[]> {
+    return Promise.resolve(database.data.comments.filter(comment => comment.author === author));
   }
 }
 

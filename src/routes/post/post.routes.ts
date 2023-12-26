@@ -90,6 +90,6 @@ postRouter.patch('/:id', authenticationMiddleware, async (ctx) => {
   ctx.response.status = 200;
   ctx.response.message = "Your post has been updated";
   ctx.response.body = updatedPost;
-})
+});
 
 export default postRouter;
