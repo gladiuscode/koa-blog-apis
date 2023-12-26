@@ -62,4 +62,34 @@ postRouter.delete('/:id', authenticationMiddleware, async (ctx) => {
   ctx.response.body = deletedPost;
 });
 
+postRouter.patch('/:id', authenticationMiddleware, async (ctx) => {
+  const { id } = ctx.params;
+  const selectedPost = await ctx.state.database.getPostBy(id);
+  if (!selectedPost) {
+    ctx.response.status = 404;
+    ctx.response.message = "Post not found";
+    return;
+  }
+
+  const isAuthor = ctx.state.user.id === selectedPost.author;
+  if (!isAuthor) {
+    ctx.response.status = 401;
+    ctx.response.message = "You can't delete other people's posts";
+    return;
+  }
+
+  const { title, description } = ctx.request.body;
+  if (!title && !description) {
+    ctx.response.status = 400;
+    ctx.response.message = "Nothing to update";
+    return;
+  }
+
+  const updatedPost = await ctx.state.database.updatePostBy({ id, title, description });
+
+  ctx.response.status = 200;
+  ctx.response.message = "Your post has been updated";
+  ctx.response.body = updatedPost;
+})
+
 export default postRouter;

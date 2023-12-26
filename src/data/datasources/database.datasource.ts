@@ -14,6 +14,12 @@ interface CreatePostPayload {
   date?: string;
 }
 
+interface UpdatePostPayload {
+  id: string;
+  title?: string;
+  description?: string;
+}
+
 export interface IDatabaseDatasource {
   getUserBy(email: string): Promise<User | undefined>;
   createUser(payload: CreateUserPayload): Promise<User | undefined>;
@@ -24,6 +30,7 @@ export interface IDatabaseDatasource {
   deleteUserPosts(author: string): Promise<Post[]>;
   createPost(payload: CreatePostPayload): Promise<Post>;
   deletePostBy(id: string): Promise<Post | undefined>;
+  updatePostBy(payload: UpdatePostPayload): Promise<Post | undefined>;
 }
 
 class DatabaseDatasource implements IDatabaseDatasource {
@@ -115,6 +122,31 @@ class DatabaseDatasource implements IDatabaseDatasource {
     await database.write();
 
     return post;
+  }
+
+  async updatePostBy({ id, title, description }: UpdatePostPayload) {
+    const postIndex = database.data.posts.findIndex(post => post.id === id);
+    if (postIndex == -1) {
+      return;
+    }
+
+    const oldPost = database.data.posts[postIndex];
+
+    const updatedPost: Post = {
+      ...oldPost,
+      title: title ?? oldPost.title,
+      description: description ?? oldPost.description,
+    }
+
+    database.data.posts = [
+      ...database.data.posts.slice(0, postIndex),
+      updatedPost,
+      ...database.data.posts.slice(postIndex + 1),
+    ]
+
+    await database.write();
+
+    return updatedPost;
   }
 }
 
