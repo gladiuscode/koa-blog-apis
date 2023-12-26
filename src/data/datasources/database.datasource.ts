@@ -27,6 +27,11 @@ interface UpdatePostPayload {
   description?: string;
 }
 
+interface UpdateCommentPayload {
+  id: string;
+  text: string;
+}
+
 export interface IDatabaseDatasource {
   getUserBy(email: string): Promise<User | undefined>;
   createUser(payload: CreateUserPayload): Promise<User | undefined>;
@@ -45,6 +50,7 @@ export interface IDatabaseDatasource {
   deleteCommentBy(id: string): Promise<Comment | undefined>;
   deleteUserComments(author: string): Promise<Comment[]>;
   getPostComments(postId: string): Promise<Comment[]>;
+  updateCommentBy(payload: UpdateCommentPayload): Promise<Comment | undefined>;
 }
 
 class DatabaseDatasource implements IDatabaseDatasource {
@@ -219,6 +225,30 @@ class DatabaseDatasource implements IDatabaseDatasource {
 
   getPostComments(postId: string) {
     return Promise.resolve(database.data.comments.filter(comment => comment.postId === postId));
+  }
+
+  async updateCommentBy({ id, text }: UpdateCommentPayload) {
+    const commentIndex = database.data.comments.findIndex(comment => comment.id === id);
+    if (commentIndex == -1) {
+      return;
+    }
+
+    const oldComment = database.data.comments[commentIndex];
+
+    const updatedComment: Comment = {
+      ...oldComment,
+      text: text ?? oldComment.text,
+    }
+
+    database.data.comments = [
+      ...database.data.comments.slice(0, commentIndex),
+      updatedComment,
+      ...database.data.comments.slice(commentIndex + 1),
+    ]
+
+    await database.write();
+
+    return updatedComment;
   }
 }
 
