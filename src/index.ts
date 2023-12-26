@@ -5,6 +5,7 @@ import loggerMiddleware from "./middlewares/logger.middleware.js";
 import authRouter from "./routes/auth/auth.routes.js";
 import userRouter from "./routes/user/user.routes.js";
 import postRouter from "./routes/post/post.routes.js";
+import databaseInitMiddleware from "./middlewares/databaseInit.middleware.js";
 
 const app = new Koa();
 const router = new Router();
@@ -24,6 +25,7 @@ router.use(
 app
   .use(loggerMiddleware)
   .use(bodyParser())
+  .use(databaseInitMiddleware)
   .use(router.routes())
   .use(router.allowedMethods());
 
