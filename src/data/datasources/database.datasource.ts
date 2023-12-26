@@ -20,6 +20,8 @@ export interface IDatabaseDatasource {
   deleteUserBy(email: string): Promise<User | undefined>;
   getPosts(): Promise<Post[]>;
   getPostBy(id: string): Promise<Post | undefined>;
+  getUserPosts(author: string): Promise<Post[]>;
+  deleteUserPosts(author: string): Promise<Post[]>;
   createPost(payload: CreatePostPayload): Promise<Post>;
   deletePostBy(id: string): Promise<Post | undefined>;
 }
@@ -66,6 +68,23 @@ class DatabaseDatasource implements IDatabaseDatasource {
 
   getPostBy(id: string) {
     return Promise.resolve(database.data.posts.find(post => post.id === id));
+  }
+
+  getUserPosts(author: string) {
+    return Promise.resolve(database.data.posts.filter(post => post.author === author));
+  }
+
+  async deleteUserPosts(author: string) {
+    const userPosts = database.data.posts.filter(post => post.author === author);
+    if (!userPosts.length) {
+      return userPosts;
+    }
+
+    database.data.posts = database.data.posts.filter(post => !userPosts.find(userPost => userPost.id !== post.id));
+
+    await database.write();
+
+    return userPosts;
   }
 
   async createPost({ title, description, author, date }: CreatePostPayload) {
