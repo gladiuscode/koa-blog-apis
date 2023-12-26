@@ -44,6 +44,7 @@ export interface IDatabaseDatasource {
   createComment(payload: CreateCommentPayload): Promise<Comment>;
   deleteCommentBy(id: string): Promise<Comment | undefined>;
   deleteUserComments(author: string): Promise<Comment[]>;
+  getPostComments(postId: string): Promise<Comment[]>;
 }
 
 class DatabaseDatasource implements IDatabaseDatasource {
@@ -166,7 +167,7 @@ class DatabaseDatasource implements IDatabaseDatasource {
     return Promise.resolve(database.data.comments);
   }
 
-  getCommentBy(id: string): Promise<Comment | undefined> {
+  getCommentBy(id: string) {
     return Promise.resolve(database.data.comments.find(comment => comment.id === id));
   }
 
@@ -200,7 +201,7 @@ class DatabaseDatasource implements IDatabaseDatasource {
     return comment;
   }
 
-  async deleteUserComments(author: string): Promise<Comment[]> {
+  async deleteUserComments(author: string) {
     const userComments = database.data.comments.filter(comment => comment.author === author);
     if (!userComments.length) {
       return [];
@@ -212,8 +213,12 @@ class DatabaseDatasource implements IDatabaseDatasource {
     return userComments;
   }
 
-  getUserComments(author: string): Promise<Comment[]> {
+  getUserComments(author: string) {
     return Promise.resolve(database.data.comments.filter(comment => comment.author === author));
+  }
+
+  getPostComments(postId: string) {
+    return Promise.resolve(database.data.comments.filter(comment => comment.postId === postId));
   }
 }
 

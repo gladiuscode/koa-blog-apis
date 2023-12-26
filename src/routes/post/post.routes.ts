@@ -92,4 +92,19 @@ postRouter.patch('/:id', authenticationMiddleware, async (ctx) => {
   ctx.response.body = updatedPost;
 });
 
+postRouter.get('/:id/comment', async (ctx) => {
+  const { id } = ctx.params;
+  const selectedPost = await ctx.state.database.getPostBy(id);
+  if (!selectedPost) {
+    ctx.response.status = 404;
+    ctx.response.message = "Post not found";
+    return;
+  }
+
+  const postComments = await ctx.state.database.getPostComments(id);
+
+  ctx.response.status = 200;
+  ctx.response.body = postComments;
+})
+
 export default postRouter;
